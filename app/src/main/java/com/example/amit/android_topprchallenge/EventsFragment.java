@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,7 @@ public class EventsFragment extends Fragment implements
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View root = inflater.inflate(R.layout.fragment_events_list, container, false);
+        mRecyclerView = (RecyclerView) root.findViewById(R.id.recycler_view);
 
 
         if (savedInstanceState == null) {
@@ -100,9 +102,6 @@ public class EventsFragment extends Fragment implements
         public void onReceive(Context context, Intent intent) {
                 if (UpdaterService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
                     mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
-                    if (mIsRefreshing){
-                        refresh();
-                    }
 
                 }
         }
@@ -128,10 +127,11 @@ public class EventsFragment extends Fragment implements
        Adapter adapter = new Adapter(cursor);
 
         adapter.setHasStableIds(true);
-        mRecyclerView.setAdapter(new Adapter(cursor));
+        mRecyclerView.setAdapter(adapter);
   //      int columnCount = getResources().getInteger(R.integer.list_column_count);
+    //    StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2,1);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
     }
 
@@ -185,6 +185,7 @@ public class EventsFragment extends Fragment implements
             */
             holder.titleView.setText(mCursor.getString(EventsLoader.Query.NAME));
             holder.categoryView.setText(mCursor.getString(EventsLoader.Query.CATEGORY));
+            Log.v(LOG_TAG, mCursor.getString(EventsLoader.Query.IMAGE_URL));
 
             String thumbnailString = mCursor.getString(EventsLoader.Query.IMAGE_URL);
 
@@ -214,7 +215,7 @@ public class EventsFragment extends Fragment implements
 
         public ViewHolder(View view) {
             super(view);
-            thumbnailView = (ImageView) view.findViewById(R.id.image);
+            thumbnailView = (ImageView) view.findViewById(R.id.imageView);
             titleView = (TextView) view.findViewById(R.id.titleView);
             categoryView = (TextView) view.findViewById(R.id.categoryView);
         }
